@@ -1,11 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-// Certifique-se de que a rota /relatorios está definida no App.jsx
-// Verifique também se o componente Sidebar está importado no Layout.jsx, se estiver utilizando um
+import api from "../services/api";
 
 export default function Dashboard() {
+  const [totalProjetos, setTotalProjetos] = useState(0);
+  const [totalOrdens, setTotalOrdens] = useState(0);
+
+  useEffect(() => {
+    async function fetchDados() {
+      try {
+        const projetosRes = await api.get("/projetos");
+        const ordensRes = await api.get("/ordens-servico");
+        setTotalProjetos(projetosRes.data.length);
+        setTotalOrdens(ordensRes.data.length);
+      } catch (error) {
+        console.error("Erro ao buscar dados do dashboard:", error);
+      }
+    }
+    fetchDados();
+  }, []);
+
   return (
     <div className="container-fluid px-4">
       <h1 className="text-success">Painel Inicial</h1>
@@ -18,7 +33,10 @@ export default function Dashboard() {
           <div className="card border-0 shadow-sm animated-card">
             <div className="card-body">
               <h5 className="card-title">📁 Projetos</h5>
-              <p className="card-text">Cadastre e gerencie seus projetos.</p>
+              <p className="card-text">
+                Cadastre e gerencie seus projetos.<br />
+                <strong>Total: {totalProjetos}</strong>
+              </p>
               <Link to="/projeto" className="btn btn-warning w-100 fw-bold btn-animado">Acessar</Link>
             </div>
           </div>
@@ -28,7 +46,10 @@ export default function Dashboard() {
           <div className="card border-0 shadow-sm animated-card">
             <div className="card-body">
               <h5 className="card-title">🛠 Ordens de Serviço</h5>
-              <p className="card-text">Controle completo das OS vinculadas.</p>
+              <p className="card-text">
+                Controle completo das OS vinculadas.<br />
+                <strong>Total: {totalOrdens}</strong>
+              </p>
               <Link to="/ordem" className="btn btn-warning w-100 fw-bold btn-animado">Acessar</Link>
             </div>
           </div>
